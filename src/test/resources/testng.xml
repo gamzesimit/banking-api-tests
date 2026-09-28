@@ -5,6 +5,7 @@
     <classes>
       <class name="com.qa.parabank.AccountsApiTest"/>
       <class name="com.qa.parabank.CustomersApiTest"/>
+      <class name="com.qa.parabank.TransactionsApiTest"/>
     </classes>
   </test>
   <test name="Money movement">
