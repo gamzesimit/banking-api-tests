@@ -49,3 +49,59 @@ docker run --rm --network host \
   -e VUS=10 -e DURATION=20s \
   grafana/k6 run /scripts/read-endpoints.js
 ```
+
+---
+
+# Write profile
+
+Script: `load/transfer-write-load.js`
+Profile: ramp to 5 virtual users over 10 seconds, hold 20 seconds, ramp down
+Target: `POST /transfer` on a local container
+
+The script moves one cent from the left account to the right and back again on
+alternate iterations, so the pair holds the same total at the end as at the
+start. That is what makes it safe to run against the same environment as often
+as needed.
+
+## Thresholds agreed before the run
+
+| Threshold | Value |
+|---|---|
+| Failed requests | under 1 per cent |
+| 95th percentile response time | under 1500 ms |
+| Refused transfers | under 1 per cent |
+
+## Result
+
+| Measure | Value |
+|---|---|
+| Transfers | 15,137 |
+| Refused | 0.00 per cent |
+| Failed requests | 0.00 per cent |
+| Median response time | 8.17 ms |
+| 90th percentile | 15.50 ms |
+| 95th percentile | 18.45 ms |
+
+All three thresholds held.
+
+## One number that is not a measurement
+
+The run recorded a maximum response time of over fifteen minutes. That is not
+the application. The container running the load generator was suspended part way
+through by the host, and the request that was in flight carried the pause in its
+timing. It is written down here rather than quietly dropped, because a single
+enormous outlier is exactly the shape a real stall would take, and the only way
+to tell them apart is to know what the machine was doing.
+
+The figures that stand are the median and the percentiles, which are computed
+over fifteen thousand requests and are not moved by one outlier.
+
+## Reproducing
+
+```bash
+docker run --rm --network host \
+  -v "$PWD/load":/scripts \
+  -e BASE_URL=http://localhost:8081/parabank/services/bank \
+  -e VUS=5 \
+  grafana/k6 run /scripts/transfer-write-load.js
+```
