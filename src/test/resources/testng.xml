@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Banking API" verbose="1">
+  <test name="Accounts and customers">
+    <classes>
+      <class name="com.qa.parabank.AccountsApiTest"/>
+      <class name="com.qa.parabank.CustomersApiTest"/>
+    </classes>
+  </test>
+  <test name="Money movement">
+    <classes>
+      <class name="com.qa.parabank.TransferApiTest"/>
+    </classes>
+  </test>
+</suite>
