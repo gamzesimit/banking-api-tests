@@ -12,6 +12,7 @@
     <classes>
       <class name="com.qa.parabank.TransferApiTest"/>
       <class name="com.qa.parabank.LoanApiTest"/>
+      <class name="com.qa.parabank.ErrorHandlingApiTest"/>
     </classes>
   </test>
 </suite>
