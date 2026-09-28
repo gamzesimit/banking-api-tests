@@ -105,3 +105,6 @@ Recorded because a report that only lists faults is not a test result.
   the paying balance untouched.
 - Balances are returned with two decimal places rather than as rounded figures.
 - A customer record does not carry a password field.
+- An unknown path, a non numeric identifier and a transfer with no amount are
+  each refused rather than answered with a success code.
+- A transfer from an account to itself leaves the balance where it was.
