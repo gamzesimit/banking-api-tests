@@ -3,14 +3,14 @@
 [![tests](https://github.com/gamzesimit/banking-api-tests/actions/workflows/tests.yml/badge.svg)](https://github.com/gamzesimit/banking-api-tests/actions/workflows/tests.yml)
 
 REST Assured and TestNG checks against the API of a retail online banking
-application, plus a k6 load profile. Java 17, Maven, running on every commit.
+application, with a response time budget on every endpoint. Java 17, Maven,
+running on every commit.
 
 Three defects were found at the API surface. Two of them are critical: a transfer
 with a negative amount is accepted and reverses the direction of the money, and
 the transfer endpoint moves money without asking who is calling.
 
 Reports: [docs/defect-reports.md](docs/defect-reports.md)
-Load results: [docs/load-test-results.md](docs/load-test-results.md)
 
 ## Running it
 
@@ -25,14 +25,6 @@ Against another environment:
 BASE_URL=https://host/parabank/services/bank mvn test
 ```
 
-Load profile:
-
-```bash
-docker run --rm --network host -v "$PWD/load":/scripts \
-  -e BASE_URL=http://localhost:8081/parabank/services/bank \
-  -e VUS=10 -e DURATION=20s grafana/k6 run /scripts/read-endpoints.js
-```
-
 ## What is covered
 
 | Class | Area |
@@ -40,8 +32,12 @@ docker run --rm --network host -v "$PWD/load":/scripts \
 | `AccountsApiTest` | Response shape, two decimal places on money, unknown identifiers, ownership of every account in a list |
 | `CustomersApiTest` | Response shape, no password in the payload, unknown identifiers |
 | `TransferApiTest` | Amount moved to the cent, the pair keeps its total, negative amounts, unknown destination, unauthenticated caller |
+| `TransactionsApiTest` | Fields a statement needs, search by amount, unknown account |
+| `LoanApiTest` | A decision is returned, the down payment leaves the funding account, negative amounts, unknown customer |
+| `ErrorHandlingApiTest` | Unknown paths, identifiers that are not numbers, missing amount, transfer to the same account |
+| `ResponseTimeTest` | Every read endpoint and the transfer answer inside a stated time budget |
 
-Fourteen tests. The ones that describe a rule this build breaks are marked as
+Thirty one tests. The ones that describe a rule this build breaks are marked as
 known failures and carry the defect id, so the suite stays green while the
 defects stay visible. Alongside each of those sits a test that pins the present
 behaviour, so a fix turns into a failing test rather than passing unnoticed.
@@ -59,6 +55,5 @@ test here is built on that.
 ```
 src/test/java/com/qa/parabank/   test classes, BaseApiTest holds shared setup
 src/test/resources/testng.xml    suite definition
-load/read-endpoints.js           k6 read profile with thresholds
-docs/                            defect reports and load results
+docs/                            defect reports
 ```
